@@ -38,5 +38,6 @@ cat final-report.md | bash scripts/write-audit-report.sh --repo-root .
 ## Notes
 
 - The default scope skips `interfaces/`, `lib/`, `mocks/`, `test/`, `*.t.sol`, `*Test*.sol`, and `*Mock*.sol`.
+- `build-audit-input.sh` writes to the system temp directory by default. Use `--output-dir` when you want a deterministic location.
 - The skill works best on smaller modules. For large codebases, review one subsystem at a time.
 - `deep` mode improves coverage, but it is still not a substitute for a human audit.

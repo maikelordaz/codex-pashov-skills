@@ -19,6 +19,19 @@ json_escape() {
   printf '%s' "$value"
 }
 
+make_temp_dir() {
+  local candidate=""
+
+  for candidate in "${TMPDIR:-}" "${TEMP:-}" "${TMP:-}"; do
+    if [[ -n "$candidate" && -d "$candidate" ]]; then
+      mktemp -d "${candidate%/}/solidity-auditor-codex.XXXXXX"
+      return 0
+    fi
+  done
+
+  mktemp -d
+}
+
 resolve_optional_path() {
   local path="$1"
   local base="$2"
@@ -109,9 +122,7 @@ if ((${#relative_files[@]} == 0)); then
 fi
 
 if [[ -z "$output_dir" ]]; then
-  temp_parent="${TMPDIR:-$skill_root/tmp}"
-  mkdir -p "$temp_parent"
-  output_dir="$(mktemp -d "$temp_parent/solidity-auditor-codex.XXXXXX")"
+  output_dir="$(make_temp_dir)"
 else
   mkdir -p "$output_dir"
   output_dir="$(cd "$output_dir" && pwd -P)"
