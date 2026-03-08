@@ -1,0 +1,6 @@
+SOLIDITY AUDITOR CODEX
+======================
+
+Fast Solidity security review.
+Deterministic helpers.
+Serial deep-mode passes.
