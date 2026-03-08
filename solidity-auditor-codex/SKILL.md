@@ -31,11 +31,13 @@ If no in-scope Solidity files remain after filtering, stop and say so clearly.
 ## Workflow
 
 1. Determine the audit scope and enumerate the Solidity files to review.
-2. Apply the persistent reporting policy from `AGENTS.md` before deciding that any issue is reportable.
-3. Run a first-pass review for theft, fund lock, griefing, accounting errors, access control failures, reentrancy, unsafe token interactions, upgrade mistakes, and broken invariants.
-4. Run a second pass for cross-function, cross-contract, and state-machine issues. In `deep` mode, make this pass slower and more adversarial: look for multi-step exploit paths, composability failures, privilege-boundary mistakes, and attack chains that need setup.
-5. Use sequential multi-pass analysis. Do not assume Claude sub-agents, model pinning, `run_in_background`, Bash-only commands, or Unix-only temp paths.
-6. Deduplicate findings by root cause, keep the higher-confidence version, sort highest confidence first, and renumber sequentially.
+2. When you want a reusable review packet, run `bash scripts/build-audit-input.sh --repo-root . --mode <mode>` with optional `--file` or `--attack-vectors` arguments.
+3. Apply the persistent reporting policy from `AGENTS.md` before deciding that any issue is reportable.
+4. Run a first-pass review for theft, fund lock, griefing, accounting errors, access control failures, reentrancy, unsafe token interactions, upgrade mistakes, and broken invariants.
+5. For structured vector coverage, read `docs/worker-playbooks/vector-scan.md` and one or more files under `docs/attack-vectors/`.
+6. Run a second pass for cross-function, cross-contract, and state-machine issues. In `deep` mode, read `docs/worker-playbooks/adversarial-reasoning.md` and make this pass slower and more adversarial: look for multi-step exploit paths, composability failures, privilege-boundary mistakes, and attack chains that need setup.
+7. Use sequential multi-pass analysis. Do not assume Claude sub-agents, model pinning, `run_in_background`, or Unix-only temp paths.
+8. Deduplicate findings by root cause, keep the higher-confidence version, sort highest confidence first, and renumber sequentially.
 
 ## Report Contract
 
@@ -43,6 +45,7 @@ Produce findings directly in their final markdown form. Do not generate raw note
 
 - Output to the terminal by default.
 - Write a markdown file only when `--file-output` is explicitly requested.
+- When writing a file, prefer `bash scripts/write-audit-report.sh --repo-root .` and pass the finished markdown through stdin or `--input`.
 - When writing a file, use `assets/findings/{project-name}-pashov-ai-audit-report-{timestamp}.md`.
 - Include a scope section with the mode, reviewed files, and confidence threshold.
 - Insert a `Below Confidence Threshold` separator row in the findings summary table.
@@ -54,5 +57,6 @@ If no findings survive the reporting gate, state that no reportable findings wer
 
 - Skip the source banner. It is presentation-only and currently encoding-corrupted.
 - Treat any version check as optional and non-blocking. Use `bash scripts/check-version.sh --check-remote` only when that extra check is worth the latency.
+- Use `templates/audit-report-template.md` as the final markdown contract and `docs/usage.md` as the quick reference.
 - For codebases above roughly `2500` lines of Solidity, prefer reviewing module-by-module over one giant pass.
 - AI review is strongest on concrete exploit patterns and weaker on broad specification reasoning. `deep` mode improves coverage, but it does not replace a human audit.
